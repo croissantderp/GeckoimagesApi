@@ -29,15 +29,14 @@ namespace GeckoimagesApi.DriveService
         public async Task checkDrive()
         {
             Console.WriteLine("Checking drive");
-            Console.WriteLine(Directory.GetCurrentDirectory());
 
             List<string> namesCalled = new List<string>();
             List<Geckoimage>? geckos = new List<Geckoimage>();
 
-            if (System.IO.File.Exists(@"./bin/Debug/net6.0/public/db.json"))
+            if (System.IO.File.Exists(@"./public/db.json"))
             {
                 //gets list of geckos already in database
-                StreamReader dbRead = new StreamReader(@"./bin/Debug/net6.0/public/db.json");
+                StreamReader dbRead = new StreamReader(@"./public/db.json");
                 geckos = JsonSerializer.Deserialize<List<Geckoimage>>(dbRead.ReadToEnd());
                 if (geckos == null)
                 {
@@ -58,12 +57,10 @@ namespace GeckoimagesApi.DriveService
                 await _context.SaveChangesAsync();
             }
 
-            Console.WriteLine(_context.Geckoimages.Count());
-
             //signs into drive
             Google.Apis.Drive.v3.DriveService driveService = DriveUtils.AuthenticateServiceAccount(
                 "geckoimagerworker@geckoimagesworker.iam.gserviceaccount.com",
-                @".\bin\Debug\net6.0\geckoimagesworker-b3ff87875739.json");
+                @".\geckoimagesworker-b3ff87875739.json");
 
             //requests all files in batches of 100
             var listRequest = driveService.Files.List();
@@ -129,7 +126,7 @@ namespace GeckoimagesApi.DriveService
                                 
                                 //downloads file
                                 using var fileStream = new FileStream(
-                                    $"./bin/Debug/net6.0/public/{name}.{a.Name.Split(".").Last()}",
+                                    $"./public/{name}.{a.Name.Split(".").Last()}",
                                     FileMode.Create,
                                     FileAccess.Write);
                                 await driveService.Files.Get(a.Id).DownloadAsync(fileStream);
@@ -149,7 +146,7 @@ namespace GeckoimagesApi.DriveService
                                     geckos[index].author = description;
                                     infoUpdated = true;
                                 }
-                                if (!System.IO.File.Exists($"./bin/Debug/net6.0/public/{geckos[index].url}"))
+                                if (!System.IO.File.Exists($"./public/{geckos[index].url}"))
                                 {
                                     var geckoo = await _context.Geckoimages.FindAsync(geckos[index].number);
                                     if (geckoo == null)
@@ -194,7 +191,7 @@ namespace GeckoimagesApi.DriveService
                                     
                                     //downloads file
                                     using var fileStream = new FileStream(
-                                        $"./bin/Debug/net6.0/public/{name}.{a.Name.Split(".").Last()}",
+                                        $"./public/{name}.{a.Name.Split(".").Last()}",
                                         FileMode.Create,
                                         FileAccess.Write);
                                     await driveService.Files.Get(a.Id).DownloadAsync(fileStream);
@@ -265,11 +262,11 @@ namespace GeckoimagesApi.DriveService
             }
 
             //remove unfound geckos
-            foreach (Geckoimage gecko in geckos)
+            foreach (Geckoimage gecko in geckos.ToList())
             {
                 if (gecko.name != null && !namesCalled.Contains(gecko.name))
                 {
-                    System.IO.File.Delete($"./bin/Debug/net6.0/public/{gecko.url}");
+                    System.IO.File.Delete($"./public/{gecko.url}");
                     geckos.Remove(gecko);
 
                     _context.Geckoimages.Remove(gecko);
@@ -280,7 +277,7 @@ namespace GeckoimagesApi.DriveService
             if (count != 0)
             {
                 //writes updated list to database
-                StreamWriter dbWrite = new StreamWriter(@"./bin/Debug/net6.0/public/db.json");
+                StreamWriter dbWrite = new StreamWriter(@"./public/db.json");
                 await dbWrite.WriteAsync(JsonSerializer.Serialize(geckos, new JsonSerializerOptions { WriteIndented = true }));
                 dbWrite.Close();
 

@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
@@ -11,13 +11,14 @@
   "profiles": {
     "GeckoimagesApi": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
+      "workingDirectory": "C:\\Users\\yiunf\\source\\repos\\GeckoimagesApi\\GeckoimagesApi\\bin\\Debug\\net6.0",
       "launchBrowser": true,
       "launchUrl": "api",
-      "applicationUrl": "https://localhost:7012;http://localhost:5012",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:7012;http://localhost:5012",
+      "dotnetRunMessages": true
     },
     "IIS Express": {
       "commandName": "IISExpress",

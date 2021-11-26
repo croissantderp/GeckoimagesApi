@@ -61,26 +61,13 @@ namespace GeckoimagesApi.Controllers
         [HttpGet("alt{id}")]
         public async Task<ActionResult<Geckoimage>> GetAlternate(string id)
         {
-            if (id.Contains("b"))
+            var geckoimage = await _context.Geckoimages.FindAsync(id.Contains("b") ? id.Replace("b", "") : "b" + id);
+            if (geckoimage == null)
             {
-                var geckoimage = await _context.Geckoimages.FindAsync(id.Replace("b", ""));
-                if (geckoimage == null)
-                {
-                    return NotFound();
-                }
-
-                return geckoimage;
+                return NotFound();
             }
-            else
-            {
-                var geckoimage = await _context.Geckoimages.FindAsync("b" + id);
-                if (geckoimage == null)
-                {
-                    return NotFound();
-                }
 
-                return geckoimage;
-            }
+            return geckoimage;
         }
 
         /*

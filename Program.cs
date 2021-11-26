@@ -5,6 +5,8 @@ using Microsoft.Extensions.FileProviders;
 
 if (Directory.Exists("./public")) Directory.CreateDirectory("./public");
 
+Console.WriteLine(Directory.GetCurrentDirectory());
+
 var options = new WebApplicationOptions { ContentRootPath = "./public" };
 
 var builder = WebApplication.CreateBuilder(options);
