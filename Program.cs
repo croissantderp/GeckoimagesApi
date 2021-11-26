@@ -39,9 +39,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 DriveCheck check = new(services.BuildServiceProvider().GetRequiredService<GeckoContext>());
-check.checkDrive().GetAwaiter().GetResult();
 check.setTimer().GetAwaiter().GetResult();
-
-Console.WriteLine("e");
 
 app.Run();

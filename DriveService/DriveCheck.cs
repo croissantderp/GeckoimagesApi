@@ -3,6 +3,7 @@ using Google.Apis.Drive.v3.Data;
 using GeckoimagesApi.Models;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace GeckoimagesApi.DriveService
 {
@@ -31,27 +32,30 @@ namespace GeckoimagesApi.DriveService
             Console.WriteLine(Directory.GetCurrentDirectory());
 
             List<string> namesCalled = new List<string>();
-            List<Geckoimage> geckos = new List<Geckoimage>();
+            List<Geckoimage>? geckos = new List<Geckoimage>();
 
             if (System.IO.File.Exists(@"./bin/Debug/net6.0/public/db.json"))
             {
                 //gets list of geckos already in database
                 StreamReader dbRead = new StreamReader(@"./bin/Debug/net6.0/public/db.json");
                 geckos = JsonSerializer.Deserialize<List<Geckoimage>>(dbRead.ReadToEnd());
+                if (geckos == null)
+                {
+                    Console.WriteLine("Something catastrophically failed, oof");
+                    return;
+                }
                 dbRead.Close();
             }
 
-            var geckoimagesInApi = await _context.Geckoimages.ToListAsync();
+            var geckoimagesInApi = (await _context.Geckoimages.ToListAsync()).Select(a => a.number);
 
             Console.WriteLine(geckoimagesInApi.Count());
-
-            foreach (Geckoimage gecko in geckos)
+            foreach (var gecko in from Geckoimage gecko in geckos 
+                                  where !geckoimagesInApi.Contains(gecko.number) 
+                                  select gecko)
             {
-                if (!geckoimagesInApi.Contains(gecko))
-                {
-                    _context.Geckoimages.Add(gecko);
-                    await _context.SaveChangesAsync();
-                }
+                _context.Geckoimages.Add(gecko);
+                await _context.SaveChangesAsync();
             }
 
             Console.WriteLine(_context.Geckoimages.Count());
@@ -200,7 +204,13 @@ namespace GeckoimagesApi.DriveService
                                 if (infoUpdated)
                                 {
                                     var gecko = await _context.Geckoimages.FindAsync(geckos[index].number);
+                                    if (gecko == null)
+                                    {
+                                        Console.WriteLine(geckos[index].number);
+                                        continue;
+                                    }
                                     _context.Geckoimages.Remove(gecko);
+                                    await _context.SaveChangesAsync();
                                     _context.Geckoimages.Add(geckos[index]);
                                     await _context.SaveChangesAsync();
                                 }
@@ -257,7 +267,7 @@ namespace GeckoimagesApi.DriveService
             //remove unfound geckos
             foreach (Geckoimage gecko in geckos)
             {
-                if (!namesCalled.Contains(gecko.name))
+                if (gecko.name != null && !namesCalled.Contains(gecko.name))
                 {
                     System.IO.File.Delete($"./bin/Debug/net6.0/public/{gecko.url}");
                     geckos.Remove(gecko);

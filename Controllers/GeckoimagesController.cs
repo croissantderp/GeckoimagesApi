@@ -41,15 +41,48 @@ namespace GeckoimagesApi.Controllers
             return geckoimage;
         }
 
-        // GET: api/5
+        // GET: api/highest
         [HttpGet("highest")]
         public async Task<ActionResult<Geckoimage>> GetHighestGeckoimage()
         {
-            var geckoimage = _context.Geckoimages.ToList().Where(a => !a.name.Contains("b")).OrderByDescending(a => a.name).First();
+            var num = (await _context.Geckoimages.Where(a => a.number == null ? false : !a.number.Contains("b")).CountAsync() - 1).ToString();
+
+            var geckoimage = await _context.Geckoimages.FindAsync(num);
+
+            if (geckoimage == null)
+            {
+                return NotFound();
+            }
 
             return geckoimage;
         }
-        
+
+        // GET: api/alt5
+        [HttpGet("alt{id}")]
+        public async Task<ActionResult<Geckoimage>> GetAlternate(string id)
+        {
+            if (id.Contains("b"))
+            {
+                var geckoimage = await _context.Geckoimages.FindAsync(id.Replace("b", ""));
+                if (geckoimage == null)
+                {
+                    return NotFound();
+                }
+
+                return geckoimage;
+            }
+            else
+            {
+                var geckoimage = await _context.Geckoimages.FindAsync("b" + id);
+                if (geckoimage == null)
+                {
+                    return NotFound();
+                }
+
+                return geckoimage;
+            }
+        }
+
         /*
         // PUT: api/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
