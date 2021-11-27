@@ -8,7 +8,18 @@ if (!Directory.Exists("./public")) Directory.CreateDirectory("./public");
 
 var options = new WebApplicationOptions { WebRootPath = "../public", ContentRootPath = "./public" };
 
+var origins = "_allowedOrigins";
+
 var builder = WebApplication.CreateBuilder(options);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: origins,
+                      builder =>
+                      {
+                          builder.WithOrigins("http://geckoimages.ddns.net");
+                      });
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -38,6 +49,8 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+
+app.UseCors(origins);
 
 app.UseAuthorization();
 
