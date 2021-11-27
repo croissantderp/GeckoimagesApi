@@ -13,7 +13,7 @@
       "commandName": "Project",
       "workingDirectory": "C:\\Users\\yiunf\\source\\repos\\GeckoimagesApi\\GeckoimagesApi\\bin\\Debug\\net6.0",
       "launchBrowser": true,
-      "launchUrl": "api",
+      "launchUrl": "",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -23,7 +23,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api",
+      "launchUrl": "",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

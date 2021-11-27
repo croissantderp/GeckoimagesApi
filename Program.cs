@@ -3,11 +3,9 @@ using GeckoimagesApi.Models;
 using GeckoimagesApi.DriveService;
 using Microsoft.Extensions.FileProviders;
 
-if (Directory.Exists("./public")) Directory.CreateDirectory("./public");
+if (!Directory.Exists("./public")) Directory.CreateDirectory("./public");
 
-Console.WriteLine(Directory.GetCurrentDirectory());
-
-var options = new WebApplicationOptions { ContentRootPath = "./public" };
+var options = new WebApplicationOptions { WebRootPath = "../wwwroot/", ContentRootPath = Path.Combine("./public", "../wwwroot") };
 
 var builder = WebApplication.CreateBuilder(options);
 
@@ -24,13 +22,18 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseHttpsRedirection();
+app.UseDefaultFiles(new DefaultFilesOptions 
+{
+    DefaultFileNames = new[] { "./index.html" },
+});
 
 // using Microsoft.Extensions.FileProviders;
 // using System.IO;
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(builder.Environment.ContentRootPath),
+    ServeUnknownFileTypes = true,
+    FileProvider = new PhysicalFileProvider(
+            Path.Combine(app.Environment.WebRootPath, app.Environment.ContentRootPath)),
     RequestPath = ""
 });
 
