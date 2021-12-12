@@ -94,16 +94,12 @@ namespace GeckoimagesApi.DriveService
                             {
                                 count++;
 
+                                string name = a.Name.Split("_").First();
+
                                 if (!highestFound && new Regex(@"^\d+_.+").Match(a.Name).Success)
                                 {
-                                    highestGecko = int.Parse(a.Name.Remove(3));
+                                    highestGecko = int.Parse(name);
                                     highestFound = true;
-                                }
-
-                                string name = a.Name.Remove(3);
-                                if (name.Contains("b")) 
-                                {
-                                    name = a.Name.Remove(4);
                                 }
 
                                 //adds gecko to database
@@ -160,16 +156,12 @@ namespace GeckoimagesApi.DriveService
                                     geckos.RemoveAt(index);
                                     count++;
 
+                                    string name = a.Name.Split("_").First();
+
                                     if (!highestFound && new Regex(@"^\d+_.+").Match(a.Name).Success)
                                     {
-                                        highestGecko = int.Parse(a.Name.Remove(3));
+                                        highestGecko = int.Parse(name);
                                         highestFound = true;
-                                    }
-
-                                    string name = a.Name.Remove(3);
-                                    if (name.Contains("b")) 
-                                    {
-                                        name = a.Name.Remove(4);
                                     }
 
                                     //adds gecko to database

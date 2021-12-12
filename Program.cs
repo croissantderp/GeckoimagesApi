@@ -18,6 +18,8 @@ builder.Services.AddCors(options =>
                       builder =>
                       {
                           builder.WithOrigins("http://geckoimages.ddns.net");
+                          builder.AllowAnyHeader();
+                          builder.AllowAnyMethod();
                       });
 });
 
@@ -47,6 +49,8 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(app.Environment.ContentRootPath),
     RequestPath = ""
 });
+
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 
