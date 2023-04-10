@@ -76,6 +76,8 @@ namespace GeckoimagesApi.DriveService
 
             try
             {
+                List<Google.Apis.Drive.v3.Data.File> saveForLater = new List<Google.Apis.Drive.v3.Data.File>();
+
                 //iterates through the pages of 100
                 while (true)
                 {
@@ -210,31 +212,38 @@ namespace GeckoimagesApi.DriveService
                         //else if file matches submission naming convention
                         else if (new Regex(@".+ - .+").Match(a.Name).Success)
                         {
-                            updateCount++;
+                            if (!highestFound)
+                            {
+                                saveForLater.Add(a);
+                            }
+                            else
+                            {
+                                updateCount++;
 
-                            //new file to update
-                            Google.Apis.Drive.v3.Data.File file = new Google.Apis.Drive.v3.Data.File();
+                                //new file to update
+                                Google.Apis.Drive.v3.Data.File file = new Google.Apis.Drive.v3.Data.File();
 
-                            //splits name and subsplits it
-                            List<string> splitName = a.Name.Split(" - ").ToList();
+                                //splits name and subsplits it
+                                List<string> splitName = a.Name.Split(" - ").ToList();
 
-                            List<string> nameSplit = splitName.Last().Split(".").ToList();
+                                List<string> nameSplit = splitName.Last().Split(".").ToList();
 
-                            string extension = nameSplit.Last();
+                                string extension = nameSplit.Last();
 
-                            nameSplit.Remove(extension);
+                                nameSplit.Remove(extension);
 
-                            //updates description
-                            file.Description = string.Join(".", nameSplit);
+                                //updates description
+                                file.Description = string.Join(".", nameSplit);
 
-                            splitName.Remove(splitName.Last());
+                                splitName.Remove(splitName.Last());
 
-                            //updates name
-                            file.Name = highestGecko + "_" + string.Join(" - ", splitName).Replace(" ", "_") + "." + extension;
-                            highestGecko++;
+                                //updates name
+                                file.Name = highestGecko + "_" + string.Join(" - ", splitName).Replace(" ", "_") + "." + extension;
+                                highestGecko++;
 
-                            //updates file in drive
-                            driveService.Files.Update(file, a.Id).Execute();
+                                //updates file in drive
+                                driveService.Files.Update(file, a.Id).Execute();
+                            }
                         }
                     }
 
@@ -246,6 +255,35 @@ namespace GeckoimagesApi.DriveService
                     {
                         break;
                     }
+                }
+
+                foreach (Google.Apis.Drive.v3.Data.File a in saveForLater)
+                {
+                    updateCount++;
+
+                    //new file to update
+                    Google.Apis.Drive.v3.Data.File file = new Google.Apis.Drive.v3.Data.File();
+
+                    //splits name and subsplits it
+                    List<string> splitName = a.Name.Split(" - ").ToList();
+
+                    List<string> nameSplit = splitName.Last().Split(".").ToList();
+
+                    string extension = nameSplit.Last();
+
+                    nameSplit.Remove(extension);
+
+                    //updates description
+                    file.Description = string.Join(".", nameSplit);
+
+                    splitName.Remove(splitName.Last());
+
+                    //updates name
+                    file.Name = highestGecko + "_" + string.Join(" - ", splitName).Replace(" ", "_") + "." + extension;
+                    highestGecko++;
+
+                    //updates file in drive
+                    driveService.Files.Update(file, a.Id).Execute();
                 }
             }
             catch (Exception ex)

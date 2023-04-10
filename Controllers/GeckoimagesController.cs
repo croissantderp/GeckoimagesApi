@@ -45,7 +45,7 @@ namespace GeckoimagesApi.Controllers
         [HttpGet("highest")]
         public async Task<ActionResult<Geckoimage>> GetHighestGeckoimage()
         {
-            var num = (await _context.Geckoimages.Where(a => a.number == null ? false : !a.number.Contains("b")).CountAsync() - 1).ToString();
+            var num = _context.Geckoimages.Where(a => a.name == null ? false : !a.name.Contains("b")).OrderBy(a => a.name).First().ToString();
 
             var geckoimage = await _context.Geckoimages.FindAsync(num);
 
